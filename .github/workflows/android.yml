@@ -16,8 +16,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - id: sdk
-        uses: android-actions/setup-android@v3
       - id: gr
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -30,7 +28,7 @@ jobs:
       - name: Report
         if: always()
         run: |
-          echo "::notice title=step outcomes::checkout=${{ steps.co.outcome }} java=${{ steps.jv.outcome }} sdk=${{ steps.sdk.outcome }} gradle=${{ steps.gr.outcome }} build=${{ steps.bd.outcome }}"
+          echo "::notice title=step outcomes::checkout=${{ steps.co.outcome }} java=${{ steps.jv.outcome }} gradle=${{ steps.gr.outcome }} build=${{ steps.bd.outcome }}"
           if [ -f build.log ]; then
             msg=$(grep -nE "^e: |error:|FAILED|What went wrong|Could not|Execution failed" -A3 build.log | head -45 | sed ':a;N;$!ba;s/\n/%0A/g')
             [ -n "$msg" ] && echo "::error title=Build errors::$msg"
