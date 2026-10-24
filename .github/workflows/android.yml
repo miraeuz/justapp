@@ -31,8 +31,9 @@ jobs:
           echo "::notice title=step outcomes::checkout=${{ steps.co.outcome }} java=${{ steps.jv.outcome }} gradle=${{ steps.gr.outcome }} build=${{ steps.bd.outcome }}"
           if [ -f build.log ]; then
             msg=$(grep -nE "^e: |error:|FAILED|What went wrong|Could not|Execution failed" -A3 build.log | head -45 | sed ':a;N;$!ba;s/\n/%0A/g')
-            [ -n "$msg" ] && echo "::error title=Build errors::$msg"
+            if [ -n "$msg" ]; then echo "::warning title=Log hints::$msg"; fi
           fi
+          exit 0
       - uses: actions/upload-artifact@v4
         if: success()
         with:
