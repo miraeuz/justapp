@@ -9,22 +9,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: '17' }
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
-        with: { gradle-version: '8.9' }
-      - name: Build debug APK
+      - id: co
+        uses: actions/checkout@v4
+      - id: jv
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - id: sdk
+        uses: android-actions/setup-android@v3
+      - id: gr
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - id: bd
+        name: Build debug APK
         run: |
           set -o pipefail
           gradle --no-daemon assembleDebug 2>&1 | tee build.log
-      - name: Show Kotlin/Gradle errors
-        if: failure()
+      - name: Report
+        if: always()
         run: |
-          grep -nE "^e: |error:|FAILED|What went wrong" -A3 build.log | head -80
+          echo "::notice title=step outcomes::checkout=${{ steps.co.outcome }} java=${{ steps.jv.outcome }} sdk=${{ steps.sdk.outcome }} gradle=${{ steps.gr.outcome }} build=${{ steps.bd.outcome }}"
+          if [ -f build.log ]; then
+            msg=$(grep -nE "^e: |error:|FAILED|What went wrong|Could not|Execution failed" -A3 build.log | head -45 | sed ':a;N;$!ba;s/\n/%0A/g')
+            [ -n "$msg" ] && echo "::error title=Build errors::$msg"
+          fi
       - uses: actions/upload-artifact@v4
-        with: { name: AttestKit-debug-apk, path: app/build/outputs/apk/debug/*.apk }
+        if: success()
+        with:
+          name: AttestKit-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
       - name: Publish release
         if: success()
         uses: softprops/action-gh-release@v2
