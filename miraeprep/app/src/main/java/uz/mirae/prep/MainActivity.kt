@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 fun Root(app: PrepApp) {
     if (!app.store.onboarded) { Onboarding(app.store); return }
     var stack by remember { mutableStateOf<List<Route>>(listOf(Route.Main)) }
-    var tab by rememberSaveable { mutableIntStateOf(0) }
+    var tab by rememberSaveable { mutableStateOf(0) }
     val nav = remember {
         Nav(push = { stack = stack + it }, pop = { if (stack.size > 1) stack = stack.dropLast(1) },
             replace = { stack = stack.dropLast(1) + it }, home = { stack = listOf(Route.Main) })
