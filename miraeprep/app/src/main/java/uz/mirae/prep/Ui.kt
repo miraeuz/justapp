@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+
 package uz.mirae.prep
 
 import androidx.compose.animation.core.*
