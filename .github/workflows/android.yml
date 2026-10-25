@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APKs
 on:
   push:
     branches: [main]
@@ -8,6 +8,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: miraeprep
+            tag: miraeprep-latest
+            title: Mirae Prep (latest APK)
+          - dir: attestkit
+            tag: attestkit-latest
+            title: Attest Kit (latest APK)
     steps:
       - id: co
         uses: actions/checkout@v4
@@ -22,28 +32,30 @@ jobs:
           gradle-version: '8.9'
       - id: bd
         name: Build debug APK
+        working-directory: ${{ matrix.dir }}
         run: |
           set -o pipefail
           gradle --no-daemon assembleDebug 2>&1 | tee build.log
       - name: Report
         if: always()
+        working-directory: ${{ matrix.dir }}
         run: |
-          echo "::notice title=step outcomes::checkout=${{ steps.co.outcome }} java=${{ steps.jv.outcome }} gradle=${{ steps.gr.outcome }} build=${{ steps.bd.outcome }}"
+          echo "::notice title=${{ matrix.dir }} outcomes::build=${{ steps.bd.outcome }}"
           if [ -f build.log ]; then
-            msg=$(grep -nE "^e: |error:|FAILED|What went wrong|Could not|Execution failed" -A3 build.log | head -45 | sed ':a;N;$!ba;s/\n/%0A/g')
-            if [ -n "$msg" ]; then echo "::warning title=Log hints::$msg"; fi
+            msg=$(grep -nE "^e: |error:|FAILED|What went wrong|Could not|Execution failed" -A3 build.log | head -60 | sed ':a;N;$!ba;s/\n/%0A/g')
+            if [ -n "$msg" ]; then echo "::warning title=${{ matrix.dir }} log hints::$msg"; fi
           fi
           exit 0
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: AttestKit-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: ${{ matrix.dir }}-debug-apk
+          path: ${{ matrix.dir }}/app/build/outputs/apk/debug/*.apk
       - name: Publish release
         if: success()
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-apk
-          name: Attest Kit (latest APK)
-          files: app/build/outputs/apk/debug/*.apk
+          tag_name: ${{ matrix.tag }}
+          name: ${{ matrix.title }}
+          files: ${{ matrix.dir }}/app/build/outputs/apk/debug/*.apk
           prerelease: true
