@@ -333,14 +333,14 @@ fun ProfileTab(app: PrepApp) {
         item {
             Card2 {
                 T("Sozlamalar", 17, 900); VSpace(6)
-                SettingRow("Faqat tasdiqlangan javoblar", "Mavzu va kunlik mashqda faqat tekshirilgan kalitli savollar", s.verifiedOnly) { s.setVerified(it) }
-                SettingRow("Variantlarni aralashtirish", "Javob variantlari tartibi har safar o‘zgaradi", s.shuffle) { s.setShuffle(it) }
+                SettingRow("Faqat tasdiqlangan javoblar", "Mavzu va kunlik mashqda faqat tekshirilgan kalitli savollar", s.verifiedOnly) { s.updateVerified(it) }
+                SettingRow("Variantlarni aralashtirish", "Javob variantlari tartibi har safar o‘zgaradi", s.shuffle) { s.updateShuffle(it) }
                 VSpace(6); T("Kunlik maqsad", 14, 800); VSpace(6)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(5, 10, 20, 30).forEach { g ->
                         val on = s.goal == g
                         Box(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (on) P.blueSoft else P.bg)
-                            .border(2.dp, if (on) P.blue else P.line, RoundedCornerShape(12.dp)).clickable { s.setGoal(g) }.padding(vertical = 10.dp), contentAlignment = Alignment.Center) { T("$g", 16, 900, if (on) P.blueD else P.sub) }
+                            .border(2.dp, if (on) P.blue else P.line, RoundedCornerShape(12.dp)).clickable { s.updateGoal(g) }.padding(vertical = 10.dp), contentAlignment = Alignment.Center) { T("$g", 16, 900, if (on) P.blueD else P.sub) }
                     }
                 }
             }
@@ -359,7 +359,7 @@ fun ProfileTab(app: PrepApp) {
         var v by remember { mutableStateOf(s.name) }
         AlertDialog({ editName = false }, containerColor = P.card, title = { T("Ismingiz", 19, 900) },
             text = { OutlinedTextField(v, { v = it }, singleLine = true, shape = RoundedCornerShape(14.dp)) },
-            confirmButton = { TextButton({ s.setName(v.trim()); editName = false }) { T("Saqlash", 15, 800, P.blueD) } })
+            confirmButton = { TextButton({ s.updateName(v.trim()); editName = false }) { T("Saqlash", 15, 800, P.blueD) } })
     }
     if (confirmReset) AlertDialog({ confirmReset = false }, containerColor = P.card, title = { T("Hammasi o‘chirilsinmi?", 19, 900) },
         text = { T("Barcha javoblar tarixi, XP va seriya o‘chiriladi. Belgilangan savollar saqlanadi.", 14, 600, P.sub) },

@@ -167,10 +167,10 @@ class Store(ctx: Context) {
         name = n; goal = g; onboarded = true
         sp.edit().putString("name", n).putInt("goal", g).putBoolean("onb", true).apply()
     }
-    fun setName(v: String) { name = v; sp.edit().putString("name", v).apply() }
-    fun setGoal(v: Int) { goal = v; sp.edit().putInt("goal", v).apply() }
-    fun setVerified(v: Boolean) { verifiedOnly = v; sp.edit().putBoolean("ver", v).apply() }
-    fun setShuffle(v: Boolean) { shuffle = v; sp.edit().putBoolean("shuf", v).apply() }
+    fun updateName(v: String) { name = v; sp.edit().putString("name", v).apply() }
+    fun updateGoal(v: Int) { goal = v; sp.edit().putInt("goal", v).apply() }
+    fun updateVerified(v: Boolean) { verifiedOnly = v; sp.edit().putBoolean("ver", v).apply() }
+    fun updateShuffle(v: Boolean) { shuffle = v; sp.edit().putBoolean("shuf", v).apply() }
     fun addXp(n: Int) { xp += n; sp.edit().putInt("xp", xp).apply() }
     fun touchStreak(day: Int) {
         if (lastDay == day) return
